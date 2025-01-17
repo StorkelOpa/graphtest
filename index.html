@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interaktiver Wissensgraph</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.6/dist/dist/vis-network.min.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.6/dist/vis-network.min.js"></script>
+    <style>
+        body {
+            background-color: #222;
+            color: #eee;
+            font-family: 'Arial', sans-serif;
+            display: flex; /* Flexbox für das Layout verwenden */
+        }
+        #graph-container {
+            width: 70%; /* Mehr Platz für den Graphen */
+            height: 800px;
+            border: 1px solid #444;
+            background-color: #333;
+        }
+        #sidebar {
+            width: 30%; /* Breite für Baumansicht und Infobox */
+            display: flex;
+            flex-direction: column; /* Baumansicht und Infobox untereinander anordnen */
+        }
+        #tree-view {
+            height: 400px; /* Höhe der Baumansicht */
+            background-color: #0f0f0f;
+            border: 1px solid #444;
+            overflow-y: auto;
+            color: #eee;
+            padding-left: 10px;
+        }
+        #info-box-container {
+            height: 400px; /* Höhe der Infobox */
+            background-color: #0f0f0f;
+            border: 1px solid #444;
+            overflow-y: auto;
+            padding: 10px;
+        }
+        #legend {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background-color: #282c34;
+            padding: 10px;
+            border: 1px solid #444;
+            border-radius: 5px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            border: 1px solid #444;
+        }
+        .tree-folder {
+            padding: 5px;
+            /* Entfernt, da die Linie jetzt über Pseudoelemente erzeugt wird: border-bottom: 1px solid #444; */
+        }
+        .tree-folder-title {
+            font-weight: bold;
+            cursor: pointer;
+            color: #eee;
+            font-size: 14px;
+            white-space: nowrap;
+            position: relative; /* Für die Positionierung der Linie */
+            padding-left: 20px; /* Platz für die Linie */
+        }
+        .tree-folder-content {
+            padding-left: 40px; /* Mehr Einzug für Unterpunkte */
+            display: none;
+            color: #eee;
+            font-size: 14px;
+        }
+        .tree-item {
+            padding: 5px;
+            cursor: default;
+            font-size: 12px;
+            white-space: nowrap;
+            position: relative; /* Für die Positionierung der Linie */
+            padding-left: 20px; /* Platz für die Linie */
+        }
+        .tree-item > .tree-item {
+            padding-left: 40px;
+        }
+        /* Linien für die Baumstruktur */
+        .tree-folder-title::before,
+        .tree-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 0;
+            border-left: 1px solid #444;
+        }
+        .tree-folder-title::after,
+        .tree-item::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 20px;
+            height: 0;
+            border-top: 1px solid #444;
+        }
+        .tree-folder:last-child .tree-folder-title::before,
+        .tree-item:last-child::before {
+            height: 50%; /* Die letzte Linie nur bis zur Mitte zeichnen */
+        }
+        .tree-folder-content > .tree-item:last-child::before {
+            height: 50%;
+        }
+
+    </style>
+</head>
+<body>
+    <div id="graph-container"></div>
+    <div id="sidebar">
+        <div id="tree-view"></div>
+        <div id="info-box-container">
+            <h2>Details</h2>
+            <div id="info-content"></div>
+        </div>
+    </div>
+    <div id="legend">
+        <div class="legend-item"><div class="legend-color" style="background-color: #FF6B6B"></div>Zentral</div>
+        <div class="legend-item"><div class="legend-color" style="background-color: #4ECDC4"></div>Hauptinteressen</div>
+        <div class="legend-item"><div class="legend-color" style="background-color: #96CEB4"></div>Unterpunkte</div>
+        <div class="legend-item"><div class="legend-color" style="background-color: #FFEEAD"></div>Tools</div>
+    </div>
+
+    <script>
+        // ... (Dein JavaScript-Code, nodes, edges, options) ...
+
+        // ... (Deine Funktionen: createTreeView, createTreeFolder, createTreeItem, selectNodeInGraph, showInfo) ...
+
+        function createTreeView() {
+            const treeView = document.getElementById('tree-view');
+            treeView.innerHTML = '';
+
+            const mainNodes = nodes.get({
+                filter: function (node) {
+                    return node.group === 'main';
+                }
+            });
+
+            mainNodes.forEach(mainNode => {
+                const folder = createTreeFolder(mainNode);
+                treeView.appendChild(folder);
+            });
+        }
+
+        function createTreeFolder(mainNode) {
+            const folder = document.createElement('div');
+            folder.classList.add('tree-folder');
+            folder.innerHTML = `
+                <div class="tree-folder-title">${mainNode.label}</div>
+                <div class="tree-folder-content"></div>
+            `;
+
+            const subNodes = nodes.get({
+                filter: function (subNode) {
+                    return edges.get({
+                        filter: function (edge) {
+                            return edge.from === mainNode.id && subNode.group === 'sub';
+                        }
+                    }).map(edge => edge.to).includes(subNode.id);
+                }
+            });
+
+            subNodes.forEach(subNode => {
+                const subItem = createTreeItem(subNode);
+                folder.querySelector('.tree-folder-content').appendChild(subItem);
+
+                const toolNodes = nodes.get({
+                    filter: function (toolNode) {
+                        return edges.get({
+                            filter: function (edge) {
+                                return edge.from === subNode.id && toolNode.group === 'tools';
+                            }
+                        }).map(edge => edge.to).includes(toolNode.id);
+                    }
+                });
+
+                toolNodes.forEach(toolNode => {
+                    const toolItem = createTreeItem(toolNode);
+                    subItem.appendChild(toolItem);
+                });
+            });
+
+            // Event-Listener für das Ein- und Ausklappen der Ordner
+            folder.querySelector('.tree-folder-title').addEventListener('click', function(event) {
+                event.stopPropagation();
+                const content = this.nextElementSibling;
+                content.style.display = content.style.display === 'none' ? 'block' : 'none';
+            });
+
+            return folder;
+        }
+
+        function createTreeItem(node) {
+            const item = document.createElement('div');
+            item.classList.add('tree-item');
+            item.innerHTML = `
+                <div>${node.label}</div>
+            `;
+
+            // Event-Listener für das Auswählen eines Knotens in der Baumansicht
+            item.addEventListener('click', function(event) {
+                event.stopPropagation();
+                selectNodeInGraph(node.id);
+            });
+
+            return item;
+        }
+
+        function selectNodeInGraph(nodeId) {
+            network.selectNodes([nodeId]);
+            network.focus(nodeId, {
+                scale: 1.2,
+                animation: {
+                    duration: 500,
+                    easingFunction: 'easeInOutQuad'
+                }
+            });
+            showInfo(nodes.get(nodeId));
+        }
+
+        function showInfo(node) {
+          const infoContent = document.getElementById('info-content');
+          infoContent.innerHTML = '';
+
+          const title = document.createElement('h3');
+          title.textContent = node.label;
+          infoContent.appendChild(title);
+
+          if (node.group === 'sub' || node.group === 'tools') {
+            const description = document.createElement('p');
+            description.textContent = node.title || 'Keine Beschreibung verfügbar.';
+            infoContent.appendChild(description);
+          }
+        }
+
+        network.on("click", function(params) {
+            if (params.nodes.length > 0) {
+                const nodeId = params.nodes[0];
+                const node = nodes.get(nodeId);
+
+                // Knoten hervorheben
+                nodes.update({id: nodeId, borderWidth: 4});
+
+                // Alle anderen Knoten zurücksetzen
+                nodes.getIds().filter(id => id !== nodeId).forEach(id => {
+                    nodes.update({id: id, borderWidth: 2});
+                });
+
+                showInfo(node);
+            } else {
+                // Falls außerhalb eines Knotens geklickt wird
+                nodes.getIds().forEach(id => {
+                    nodes.update({id: id, borderWidth: 2});
+                });
+                document.getElementById('info-content').innerHTML = '';
+            }
+        });
+
+        // Baumansicht initial befüllen
+        createTreeView();
+    </script>
+</body>
+</html>
