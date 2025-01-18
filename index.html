@@ -389,10 +389,15 @@
       title.textContent = node.label;
       infoContent.appendChild(title);
 
-      if (node.group === 'sub' || node.group === 'tools') {
-        const description = document.createElement('p');
-        description.textContent = node.title || 'Keine Beschreibung verfügbar.';
-        infoContent.appendChild(description);
+  // Beschreibung hinzufügen, falls vorhanden
+      if (node.description) {
+        const descriptionElement = document.createElement('p');
+        descriptionElement.textContent = node.description;
+        infoContent.appendChild(descriptionElement);
+      } else {
+        const noDescription = document.createElement('p');
+        noDescription.textContent = 'Keine Beschreibung verfügbar.';
+        infoContent.appendChild(noDescription);
       }
     }
 
