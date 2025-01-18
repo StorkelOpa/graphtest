@@ -6,7 +6,7 @@
     <title>Interaktiver Wissensgraph</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.6/dist/dist/vis-network.min.css" rel="stylesheet" type="text/css" />
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.6/dist/vis-network.min.js"></script>
-    <style>
+    <script type="text/javascript" src="nodes_data.js"></script> <style>
         body {
             background-color: #222;
             color: #eee;
@@ -137,9 +137,54 @@
     </div>
 
     <script>
-        // ... (Dein JavaScript-Code, nodes, edges, options) ...
+        // Erstelle die Nodes und Edges aus den importierten Daten
+        const nodes = new vis.DataSet(nodesData);
+        const edges = new vis.DataSet(edgesData);
 
-        // ... (Deine Funktionen: createTreeView, createTreeFolder, createTreeItem, selectNodeInGraph, showInfo) ...
+        // Optionen für das Netzwerk
+        const options = {
+            nodes: {
+                shape: 'dot',
+                size: 20,
+                font: {
+                    size: 16,
+                    color: '#ffffff'
+                },
+                borderWidth: 2,
+                shadow: true,
+                color: {
+                    border: '#2B7CE9',
+                    background: '#97C2FC'
+                }
+            },
+            edges: {
+                width: 2,
+                shadow: true,
+                smooth: {
+                    type: 'continuous',
+                    forceDirection: 'none',
+                    roundness: 0.5
+                },
+                color: {
+                    color: '#848484',
+                    highlight: '#848484',
+                    hover: '#848484',
+                    inherit: 'from',
+                    opacity: 1.0
+                }
+            },
+            physics: {
+                enabled: false
+            },
+            interaction: {
+                hover: true,
+                navigationButtons: true,
+                keyboard: true
+            }
+        };
+
+        // Initialisierung des Netzwerks
+        const network = new vis.Network(document.getElementById('graph-container'), { nodes, edges }, options);
 
         function createTreeView() {
             const treeView = document.getElementById('tree-view');
