@@ -273,52 +273,55 @@
     }
 
     function createTreeFolder(mainNode) {
-        const folder = document.createElement('div');
-        folder.classList.add('tree-folder');
-        folder.innerHTML = `
-            <div class="tree-folder-title">${mainNode.label}</div>
-            <div class="tree-folder-content"></div>
-        `;
+    const folder = document.createElement('div');
+    folder.classList.add('tree-folder');
+    folder.innerHTML = `
+        <div class="tree-folder-title">${mainNode.label}</div>
+        <div class="tree-folder-content" style="display: none;"></div>
+    `;
 
-        const subNodes = nodes.get({
-            filter: function (subNode) {
+    const folderTitle = folder.querySelector('.tree-folder-title');
+    const folderContent = folder.querySelector('.tree-folder-content');
+    let isOpen = false; // Zustand des Ordners
+
+    const subNodes = nodes.get({
+        filter: function (subNode) {
+            return edges.get({
+                filter: function (edge) {
+                    return edge.from === mainNode.id && subNode.group === 'sub';
+                }
+            }).map(edge => edge.to).includes(subNode.id);
+        }
+    });
+
+    subNodes.forEach(subNode => {
+        const subItem = createTreeItem(subNode);
+        folderContent.appendChild(subItem);
+
+        const toolNodes = nodes.get({
+            filter: function (toolNode) {
                 return edges.get({
                     filter: function (edge) {
-                        return edge.from === mainNode.id && subNode.group === 'sub';
+                        return edge.from === subNode.id && toolNode.group === 'tools';
                     }
-                }).map(edge => edge.to).includes(subNode.id);
+                }).map(edge => edge.to).includes(toolNode.id);
             }
         });
 
-        subNodes.forEach(subNode => {
-            const subItem = createTreeItem(subNode);
-            folder.querySelector('.tree-folder-content').appendChild(subItem);
-
-            const toolNodes = nodes.get({
-                filter: function (toolNode) {
-                    return edges.get({
-                        filter: function (edge) {
-                            return edge.from === subNode.id && toolNode.group === 'tools';
-                        }
-                    }).map(edge => edge.to).includes(toolNode.id);
-                }
-            });
-
-            toolNodes.forEach(toolNode => {
-                const toolItem = createTreeItem(toolNode);
-                subItem.appendChild(toolItem);
-            });
+        toolNodes.forEach(toolNode => {
+            const toolItem = createTreeItem(toolNode);
+            subItem.appendChild(toolItem);
         });
+    });
 
-        folder.querySelector('.tree-folder-title').addEventListener('click', function(event) {
-            event.stopPropagation();
-            const content = this.nextElementSibling;
-            content.style.display = content.style.display === 'none' ? 'block' : 'none';
-        });
+    folderTitle.addEventListener('click', function(event) {
+        event.stopPropagation();
+        isOpen = !isOpen; // Zustand umschalten
+        folderContent.style.display = isOpen ? 'block' : 'none';
+    });
 
-        return folder;
-    }
-
+    return folder;
+}
     function createTreeItem(node) {
         const item = document.createElement('div');
         item.classList.add('tree-item');
