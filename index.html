@@ -6,9 +6,116 @@
     <title>Interaktiver Wissensgraph</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.6/dist/dist/vis-network.min.css" rel="stylesheet" type="text/css" />
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.6/dist/vis-network.min.js"></script>
-    <script type="text/javascript" src="nodes_data.js"></script>
     <style>
-        /* ... (Dein CSS-Code, unverändert) ... */
+               body {
+            background-color: #222;
+            color: #eee;
+            font-family: 'Arial', sans-serif;
+            display: flex; /* Flexbox für das Layout verwenden */
+        }
+        #graph-container {
+            width: 70%; /* Mehr Platz für den Graphen */
+            height: 800px;
+            border: 1px solid #444;
+            background-color: #333;
+        }
+        #sidebar {
+            width: 30%; /* Breite für Baumansicht und Infobox */
+            display: flex;
+            flex-direction: column; /* Baumansicht und Infobox untereinander anordnen */
+        }
+        #tree-view {
+            height: 400px; /* Höhe der Baumansicht */
+            background-color: #0f0f0f;
+            border: 1px solid #444;
+            overflow-y: auto;
+            color: #eee;
+            padding-left: 10px;
+        }
+        #info-box-container {
+            height: 400px; /* Höhe der Infobox */
+            background-color: #0f0f0f;
+            border: 1px solid #444;
+            overflow-y: auto;
+            padding: 10px;
+        }
+        #legend {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background-color: #282c34;
+            padding: 10px;
+            border: 1px solid #444;
+            border-radius: 5px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            border: 1px solid #444;
+        }
+        .tree-folder {
+            padding: 5px;
+        }
+        .tree-folder-title {
+            font-weight: bold;
+            cursor: pointer;
+            color: #eee;
+            font-size: 14px;
+            white-space: nowrap;
+            position: relative; /* Für die Positionierung der Linie */
+            padding-left: 20px; /* Platz für die Linie */
+        }
+        .tree-folder-content {
+            padding-left: 40px; /* Mehr Einzug für Unterpunkte */
+            display: none;
+            color: #eee;
+            font-size: 14px;
+        }
+        .tree-item {
+            padding: 5px;
+            cursor: default;
+            font-size: 12px;
+            white-space: nowrap;
+            position: relative; /* Für die Positionierung der Linie */
+            padding-left: 20px; /* Platz für die Linie */
+        }
+        .tree-item > .tree-item {
+            padding-left: 40px;
+        }
+        /* Linien für die Baumstruktur */
+        .tree-folder-title::before,
+        .tree-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 0;
+            border-left: 1px solid #444;
+        }
+        .tree-folder-title::after,
+        .tree-item::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 20px;
+            height: 0;
+            border-top: 1px solid #444;
+        }
+
+        /* Korrigierte Regel für die letzte Linie */
+        .tree-folder:last-child > .tree-folder-title::before,
+        .tree-folder-content > .tree-item:last-child::before {
+            height: 50%; /* Die letzte Linie nur bis zur Mitte zeichnen */
+        }
+
     </style>
 </head>
 <body>
@@ -27,57 +134,72 @@
         <div class="legend-item"><div class="legend-color" style="background-color: #FFEEAD"></div>Tools</div>
     </div>
 
-    <script>
-        // Erstelle die Nodes und Edges aus den importierten Daten
-        const nodes = new vis.DataSet(nodesData);
-        const edges = new vis.DataSet(edgesData);
+    <script type="module"> // Beachte: type="module" ist wichtig!
+      // Importiere die nodes und edges aus nodes_data.js
+      import { nodes, edges } from './nodes_data.js';
 
-        // Optionen für das Netzwerk
-        const options = {
-            nodes: {
-                shape: 'dot',
-                size: 20,
-                font: {
-                    size: 16,
-                    color: '#ffffff'
-                },
-                borderWidth: 2,
-                shadow: true,
-                color: {
-                    border: '#2B7CE9',
-                    background: '#97C2FC'
-                }
-            },
-            edges: {
-                width: 2,
-                shadow: true,
-                smooth: {
-                    type: 'continuous',
-                    forceDirection: 'none',
-                    roundness: 0.5
-                },
-                color: {
-                    color: '#848484',
-                    highlight: '#848484',
-                    hover: '#848484',
-                    inherit: 'from',
-                    opacity: 1.0
-                }
-            },
-            physics: {
-                enabled: false
-            },
-            interaction: {
-                hover: true,
-                navigationButtons: true,
-                keyboard: true
-            }
-        };
+      // Optionen für das Netzwerk (konfiguriere das Aussehen und Verhalten)
+       const options = {
+          nodes: {
+              shape: 'dot',
+              size: 20,
+              font: {
+                  size: 16,
+                  face: 'arial',
+                  color: '#eee'
+              },
+              borderWidth: 2,
+              shadow: true
+          },
+          edges: {
+              width: 2,
+              smooth: {
+                  type: 'continuous'
+              },
+              arrows: {
+                  to: { enabled: true, scaleFactor: 0.5 }
+              },
+              color: '#eee'
+          },
+          groups: {
+              center: {
+                  color: { background: '#FF6B6B', border: '#CC5555' }
+              },
+              main: {
+                  color: { background: '#4ECDC4', border: '#45B7AF' }
+              },
+              sub: {
+                  color: { background: '#96CEB4', border: '#7BA696' }
+              },
+              tools: {
+                  color: { background: '#FFEEAD', border: '#D4C690' }
+              },
+          },
+          physics: {
+              enabled: true,
+              barnesHut: {
+                  gravitationalConstant: -3000,
+                  centralGravity: 0.3,
+                  springLength: 150,
+                  springConstant: 0.04,
+                  damping: 0.09,
+                  avoidOverlap: 0.5
+              }
+          },
+          interaction: {
+              hover: true,
+              zoomView: true,
+              dragView: true,
+              multiselect: false
+          }
+      };
 
-        // Initialisierung des Netzwerks
-        const network = new vis.Network(document.getElementById('graph-container'), { nodes, edges }, options);
+      // Hier wird der Graph-Container mit dem Netzwerk verbunden
+      const container = document.getElementById('graph-container'); // Holt die Referenz auf das <div>
+      const data = { nodes, edges }; // Verwende die importierten nodes und edges
+      const network = new vis.Network(container, data, options); // Erstellt das Netzwerk im Container
 
-        // Deine Funktionen
+        // Funktionen für die Baumansicht und die Info-Box (unverändert)
         function createTreeView() {
             const treeView = document.getElementById('tree-view');
             treeView.innerHTML = '';
