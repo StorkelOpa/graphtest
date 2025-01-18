@@ -1,336 +1,154 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interaktiver Wissensgraph</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.6/dist/dist/vis-network.min.css" rel="stylesheet" type="text/css" />
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.6/dist/vis-network.min.js"></script>
-    <style>
-        body {
-            background-color: #222;
-            color: #eee;
-            font-family: 'Arial', sans-serif;
-            display: flex;
-            flex-direction: column; /* Hauptlayout vertikal */
-            height: 100vh; /* Volle Viewport-Höhe */
-            margin: 0; /* Standard-Margins entfernen */
+import { nodes as nodeDataSet, edges as edgeDataSet } from './nodes_data.js';
+
+const graphContainer = document.getElementById('graph-container');
+const treeView = document.getElementById('tree-view');
+const infoContent = document.getElementById('info-content');
+
+// Optionen für das Netzwerk
+const networkOptions = {
+    nodes: {
+        shape: 'dot',
+        size: 20,
+        font: { size: 16, face: 'arial', color: '#eee' },
+        borderWidth: 2,
+        shadow: true
+    },
+    edges: {
+        width: 2,
+        smooth: { type: 'continuous' },
+        arrows: { to: { enabled: true, scaleFactor: 0.5 } },
+        color: '#eee'
+    },
+    groups: {
+        center: { color: { background: '#FF6B6B', border: '#CC5555' } },
+        main: { color: { background: '#4ECDC4', border: '#45B7AF' } },
+        sub: { color: { background: '#96CEB4', border: '#7BA696' } },
+        tools: { color: { background: '#FFEEAD', border: '#D4C690' } },
+    },
+    physics: {
+        enabled: true,
+        barnesHut: {
+            gravitationalConstant: -3000,
+            centralGravity: 0.3,
+            springLength: 150,
+            springConstant: 0.04,
+            damping: 0.09,
+            avoidOverlap: 0.5
         }
-        #graph-container {
-            flex: 1; /* Graph nimmt den verfügbaren Platz ein */
-            border: 1px solid #444;
-            background-color: #333;
-        }
-        #sidebar {
-            width: 100%; /* Sidebar nimmt volle Breite ein */
-            display: flex;
-            flex-direction: row; /* Baum und Info nebeneinander */
-            height: 400px; /* Feste Höhe für die Sidebar */
-        }
-        #tree-view {
-            flex: 1; /* Baumansicht und Infobox teilen sich den Platz */
-            background-color: #0f0f0f;
-            border: 1px solid #444;
-            overflow-y: auto;
-            color: #eee;
-            padding-left: 10px;
-        }
-        #info-box-container {
-            flex: 1; /* Baumansicht und Infobox teilen sich den Platz */
-            background-color: #0f0f0f;
-            border: 1px solid #444;
-            overflow-y: auto;
-            padding: 10px;
-        }
-        #legend {
-            position: absolute;
-            top: 10px;    /* Oben positionieren */
-            right: 10px;  /* Rechts positionieren */
-            background-color: #282c34;
-            padding: 10px;
-            border: 1px solid #444;
-            border-radius: 5px;
-        }
-        .legend-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 5px;
-        }
-        .legend-color {
-            width: 20px;
-            height: 20px;
-            margin-right: 10px;
-            border: 1px solid #444;
-        }
-        .tree-folder {
-            padding: 5px;
-        }
-        .tree-folder-title {
-            font-weight: bold;
-            cursor: pointer;
-            color: #eee;
-            font-size: 14px;
-            white-space: nowrap;
-            position: relative;
-            padding-left: 20px;
-        }
-        .tree-folder-content {
-            padding-left: 40px;
-            display: none;
-            color: #eee;
-            font-size: 14px;
-        }
-        .tree-item {
-            padding: 5px;
-            cursor: default;
-            font-size: 12px;
-            white-space: nowrap;
-            position: relative;
-            padding-left: 20px;
-        }
-        .tree-item > .tree-item {
-            padding-left: 40px;
-        }
-        .tree-folder-title::before,
-        .tree-item::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 100%;
-            width: 0;
-            border-left: 1px solid #444;
-        }
-        .tree-folder-title::after,
-        .tree-item::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 0;
-            width: 20px;
-            height: 0;
-            border-top: 1px solid #444;
-        }
-        .tree-folder:last-child > .tree-folder-title::before,
-        .tree-folder-content > .tree-item:last-child::before {
-            height: 50%;
-        }
-    </style>
-</head>
-<body>
-    <div id="graph-container"></div>
-    <div id="sidebar">
-        <div id="tree-view"></div>
-        <div id="info-box-container">
-            <h2>Details</h2>
-            <div id="info-content"></div>
-        </div>
-    </div>
-    <div id="legend">
-        <div class="legend-item"><div class="legend-color" style="background-color: #FF6B6B"></div>Zentral</div>
-        <div class="legend-item"><div class="legend-color" style="background-color: #4ECDC4"></div>Hauptinteressen</div>
-        <div class="legend-item"><div class="legend-color" style="background-color: #96CEB4"></div>Unterpunkte</div>
-        <div class="legend-item"><div class="legend-color" style="background-color: #FFEEAD"></div>Tools</div>
-    </div>
+    },
+    interaction: {
+        hover: true,
+        zoomView: true,
+        dragView: true,
+        multiselect: false
+    }
+};
 
-    <script type="module"> // Beachte: type="module" ist wichtig!
-      // Importiere die nodes und edges aus nodes_data.js
-      import { nodes, edges } from './nodes_data.js';
+// Netzwerk-Instanz erstellen
+const networkData = { nodes: new vis.DataSet(nodeDataSet), edges: new vis.DataSet(edgeDataSet) };
+const network = new vis.Network(graphContainer, networkData, networkOptions);
 
-      // Optionen für das Netzwerk (konfiguriere das Aussehen und Verhalten)
-       const options = {
-          nodes: {
-              shape: 'dot',
-              size: 20,
-              font: {
-                  size: 16,
-                  face: 'arial',
-                  color: '#eee'
-              },
-              borderWidth: 2,
-              shadow: true
-          },
-          edges: {
-              width: 2,
-              smooth: {
-                  type: 'continuous'
-              },
-              arrows: {
-                  to: { enabled: true, scaleFactor: 0.5 }
-              },
-              color: '#eee'
-          },
-          groups: {
-              center: {
-                  color: { background: '#FF6B6B', border: '#CC5555' }
-              },
-              main: {
-                  color: { background: '#4ECDC4', border: '#45B7AF' }
-              },
-              sub: {
-                  color: { background: '#96CEB4', border: '#7BA696' }
-              },
-              tools: {
-                  color: { background: '#FFEEAD', border: '#D4C690' }
-              },
-          },
-          physics: {
-              enabled: true,
-              barnesHut: {
-                  gravitationalConstant: -4000,
-                  centralGravity: 0.3,
-                  springLength: 150,
-                  springConstant: 0.04,
-                  damping: 0.09,
-                  avoidOverlap: 0.7
-              }
-          },
-          interaction: {
-              hover: true,
-              zoomView: true,
-              dragView: true,
-              multiselect: false
-          }
-      };
+// Funktion zum Erstellen der Baumansicht
+function createTreeView() {
+    treeView.innerHTML = '';
+    const mainNodes = networkData.nodes.get({ filter: node => node.group === 'main' });
+    mainNodes.forEach(createTreeFolder);
+}
 
-      // Hier wird der Graph-Container mit dem Netzwerk verbunden
-      const container = document.getElementById('graph-container'); // Holt die Referenz auf das <div>
-      const data = { nodes, edges }; // Verwende die importierten nodes und edges
-      const network = new vis.Network(container, data, options); // Erstellt das Netzwerk im Container
+// Funktion zum Erstellen eines Baumordners
+function createTreeFolder(mainNode) {
+    const folder = document.createElement('div');
+    folder.classList.add('tree-folder');
 
-        // Funktionen für die Baumansicht und die Info-Box (unverändert)
-        function createTreeView() {
-            const treeView = document.getElementById('tree-view');
-            treeView.innerHTML = '';
+    const titleDiv = document.createElement('div');
+    titleDiv.classList.add('tree-folder-title');
+    titleDiv.textContent = mainNode.label;
+    titleDiv.addEventListener('click', () => toggleFolderContent(contentDiv));
+    folder.appendChild(titleDiv);
 
-            const mainNodes = nodes.get({
-                filter: function (node) {
-                    return node.group === 'main';
-                }
-            });
+    const contentDiv = document.createElement('div');
+    contentDiv.classList.add('tree-folder-content');
+    folder.appendChild(contentDiv);
 
-            mainNodes.forEach(mainNode => {
-                const folder = createTreeFolder(mainNode);
-                treeView.appendChild(folder);
-            });
-        }
+    const subNodes = networkData.nodes.get({
+        filter: subNode => networkData.edges.get({
+            filter: edge => edge.from === mainNode.id && subNode.group === 'sub'
+        }).map(edge => edge.to).includes(subNode.id)
+    });
+    subNodes.forEach(subNode => createTreeItem(subNode, contentDiv, 'sub'));
 
-        function createTreeFolder(mainNode) {
-            const folder = document.createElement('div');
-            folder.classList.add('tree-folder');
-            folder.innerHTML = `
-                <div class="tree-folder-title">${mainNode.label}</div>
-                <div class="tree-folder-content"></div>
-            `;
+    treeView.appendChild(folder);
+}
 
-            const subNodes = nodes.get({
-                filter: function (subNode) {
-                    return edges.get({
-                        filter: function (edge) {
-                            return edge.from === mainNode.id && subNode.group === 'sub';
-                        }
-                    }).map(edge => edge.to).includes(subNode.id);
-                }
-            });
+// Funktion zum Erstellen eines Baum-Items
+function createTreeItem(node, parentElement, type) {
+    const itemDiv = document.createElement('div');
+    itemDiv.classList.add('tree-item');
+    itemDiv.textContent = node.label;
+    itemDiv.addEventListener('click', (event) => {
+        event.stopPropagation();
+        selectNodeInGraph(node.id);
+    });
+    parentElement.appendChild(itemDiv);
 
-            subNodes.forEach(subNode => {
-                const subItem = createTreeItem(subNode);
-                folder.querySelector('.tree-folder-content').appendChild(subItem);
-
-                const toolNodes = nodes.get({
-                    filter: function (toolNode) {
-                        return edges.get({
-                            filter: function (edge) {
-                                return edge.from === subNode.id && toolNode.group === 'tools';
-                            }
-                        }).map(edge => edge.to).includes(toolNode.id);
-                    }
-                });
-
-                toolNodes.forEach(toolNode => {
-                    const toolItem = createTreeItem(toolNode);
-                    subItem.appendChild(toolItem);
-                });
-            });
-
-            // Event-Listener für das Ein- und Ausklappen der Ordner
-            folder.querySelector('.tree-folder-title').addEventListener('click', function(event) {
-                event.stopPropagation();
-                const content = this.nextElementSibling;
-                content.style.display = content.style.display === 'none' ? 'block' : 'none';
-            });
-
-            return folder;
-        }
-
-        function createTreeItem(node) {
-            const item = document.createElement('div');
-            item.classList.add('tree-item');
-            item.innerHTML = `
-                <div>${node.label}</div>
-            `;
-
-            // Event-Listener für das Auswählen eines Knotens in der Baumansicht
-            item.addEventListener('click', function(event) {
-                event.stopPropagation();
-                selectNodeInGraph(node.id);
-            });
-
-            return item;
-        }
-
-        function selectNodeInGraph(nodeId) {
-            network.selectNodes([nodeId]);
-            network.focus(nodeId, {
-                scale: 1.2,
-                animation: {
-                    duration: 500,
-                    easingFunction: 'easeInOutQuad'
-                }
-            });
-            showInfo(nodes.get(nodeId));
-        }
-
-        function showInfo(node) {
-          const infoContent = document.getElementById('info-content');
-          infoContent.innerHTML = '';
-
-          const title = document.createElement('h3');
-          title.textContent = node.label;
-          infoContent.appendChild(title);
-
-          if (node.group === 'sub' || node.group === 'tools') {
-            const description = document.createElement('p');
-            description.textContent = node.title || 'Keine Beschreibung verfügbar.';
-            infoContent.appendChild(description);
-          }
-        }
-
-        network.on("click", function(params) {
-            if (params.nodes.length > 0) {
-                const nodeId = params.nodes[0];
-                const node = nodes.get(nodeId);
-
-                // Knoten hervorheben
-                nodes.update({id: nodeId, borderWidth: 4});
-
-                // Alle anderen Knoten zurücksetzen
-                nodes.getIds().filter(id => id !== nodeId).forEach(id => {
-                    nodes.update({id: id, borderWidth: 2});
-                });
-
-                showInfo(node);
-            } else {
-                // Falls außerhalb eines Knotens geklickt wird
-                nodes.getIds().forEach(id => {
-                    nodes.update({id: id, borderWidth: 2});
-                });
-                document.getElementById('info-content').innerHTML = '';
-            }
+    if (type === 'sub') {
+        const toolNodes = networkData.nodes.get({
+            filter: toolNode => networkData.edges.get({
+                filter: edge => edge.from === node.id && toolNode.group === 'tools'
+            }).map(edge => edge.to).includes(toolNode.id)
         });
+        toolNodes.forEach(toolNode => createTreeItem(toolNode, itemDiv, 'tool')); // Beachten Sie die Übergabe von itemDiv als parentElement
+    }
+}
 
-        // Baumansicht initial befüllen
-        createTreeView();
-    </script>
-</body>
-</html>
+// Funktion zum Ein- und Ausklappen des Ordnerinhalts
+function toggleFolderContent(contentElement) {
+    contentElement.style.display = contentElement.style.display === 'none' ? 'block' : 'none';
+}
+
+// Funktion zum Auswählen eines Knotens im Graphen
+function selectNodeInGraph(nodeId) {
+    network.selectNodes([nodeId]);
+    network.focus(nodeId, {
+        scale: 1.2,
+        animation: { duration: 500, easingFunction: 'easeInOutQuad' }
+    });
+    showInfo(networkData.nodes.get(nodeId));
+}
+
+// Funktion zum Anzeigen der Knoteninformationen
+function showInfo(node) {
+    infoContent.innerHTML = '';
+    const title = document.createElement('h3');
+    title.textContent = node.label;
+    infoContent.appendChild(title);
+
+    if (node.group === 'sub' || node.group === 'tools') {
+        const description = document.createElement('p');
+        description.textContent = node.title || 'Keine Beschreibung verfügbar.';
+        infoContent.appendChild(description);
+    }
+}
+
+// Event Listener für Klicks auf den Graphen
+network.on("click", function(params) {
+    if (params.nodes.length > 0) {
+        const nodeId = params.nodes[0];
+        // Knoten hervorheben
+        networkData.nodes.update({ id: nodeId, borderWidth: 4 });
+        // Alle anderen Knoten zurücksetzen
+        networkData.nodes.getIds().filter(id => id !== nodeId).forEach(id => {
+            networkData.nodes.update({ id: id, borderWidth: 2 });
+        });
+        showInfo(networkData.nodes.get(nodeId));
+    } else {
+        // Falls außerhalb eines Knotens geklickt wird
+        networkData.nodes.getIds().forEach(id => {
+            networkData.nodes.update({ id: id, borderWidth: 2 });
+        });
+        infoContent.innerHTML = '';
+    }
+});
+
+// Initialisiere die Baumansicht
+createTreeView();
