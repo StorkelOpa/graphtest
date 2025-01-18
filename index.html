@@ -1,154 +1,384 @@
-import { nodes as nodeDataSet, edges as edgeDataSet } from './nodes_data.js';
-
-const graphContainer = document.getElementById('graph-container');
-const treeView = document.getElementById('tree-view');
-const infoContent = document.getElementById('info-content');
-
-// Optionen für das Netzwerk
-const networkOptions = {
-    nodes: {
-        shape: 'dot',
-        size: 20,
-        font: { size: 16, face: 'arial', color: '#eee' },
-        borderWidth: 2,
-        shadow: true
-    },
-    edges: {
-        width: 2,
-        smooth: { type: 'continuous' },
-        arrows: { to: { enabled: true, scaleFactor: 0.5 } },
-        color: '#eee'
-    },
-    groups: {
-        center: { color: { background: '#FF6B6B', border: '#CC5555' } },
-        main: { color: { background: '#4ECDC4', border: '#45B7AF' } },
-        sub: { color: { background: '#96CEB4', border: '#7BA696' } },
-        tools: { color: { background: '#FFEEAD', border: '#D4C690' } },
-    },
-    physics: {
-        enabled: true,
-        barnesHut: {
-            gravitationalConstant: -3000,
-            centralGravity: 0.3,
-            springLength: 150,
-            springConstant: 0.04,
-            damping: 0.09,
-            avoidOverlap: 0.5
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interaktiver Wissensgraph</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.6/dist/dist/vis-network.min.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.6/dist/vis-network.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #282a36;
+            --text-color: #f8f8f2;
+            --accent-color: #6272a4;
+            --border-color: #44475a;
+            --highlight-color: #ff79c6;
         }
-    },
-    interaction: {
-        hover: true,
-        zoomView: true,
-        dragView: true,
-        multiselect: false
-    }
-};
 
-// Netzwerk-Instanz erstellen
-const networkData = { nodes: new vis.DataSet(nodeDataSet), edges: new vis.DataSet(edgeDataSet) };
-const network = new vis.Network(graphContainer, networkData, networkOptions);
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Modernere Schriftart */
+            display: flex;
+            margin: 0; /* Entfernt Standard-Margin */
+            overflow: hidden; /* Verhindert Scrollbalken am Body */
+        }
 
-// Funktion zum Erstellen der Baumansicht
-function createTreeView() {
-    treeView.innerHTML = '';
-    const mainNodes = networkData.nodes.get({ filter: node => node.group === 'main' });
-    mainNodes.forEach(createTreeFolder);
-}
+        #graph-container {
+            flex: 7; /* Nimmt mehr Platz ein */
+            height: 100vh; /* Volle Höhe des Viewports */
+            background-color: #343746;
+            border-right: 1px solid var(--border-color); /* Visuelle Trennung */
+        }
 
-// Funktion zum Erstellen eines Baumordners
-function createTreeFolder(mainNode) {
-    const folder = document.createElement('div');
-    folder.classList.add('tree-folder');
+        #sidebar {
+            flex: 3; /* Nimmt weniger Platz ein */
+            display: flex;
+            flex-direction: column;
+            background-color: #21222c;
+        }
 
-    const titleDiv = document.createElement('div');
-    titleDiv.classList.add('tree-folder-title');
-    titleDiv.textContent = mainNode.label;
-    titleDiv.addEventListener('click', () => toggleFolderContent(contentDiv));
-    folder.appendChild(titleDiv);
+        #tree-view {
+            flex: 1; /* Nimmt den oberen Teil der Sidebar ein */
+            background-color: #282a36;
+            border-bottom: 1px solid var(--border-color);
+            overflow-y: auto;
+            padding: 15px;
+        }
 
-    const contentDiv = document.createElement('div');
-    contentDiv.classList.add('tree-folder-content');
-    folder.appendChild(contentDiv);
+        #info-box-container {
+            flex: 1; /* Nimmt den unteren Teil der Sidebar ein */
+            background-color: #282a36;
+            overflow-y: auto;
+            padding: 15px;
+        }
 
-    const subNodes = networkData.nodes.get({
-        filter: subNode => networkData.edges.get({
-            filter: edge => edge.from === mainNode.id && subNode.group === 'sub'
-        }).map(edge => edge.to).includes(subNode.id)
-    });
-    subNodes.forEach(subNode => createTreeItem(subNode, contentDiv, 'sub'));
+        #info-box-container h2 {
+            color: var(--highlight-color);
+            margin-top: 0;
+        }
 
-    treeView.appendChild(folder);
-}
+        #legend {
+            position: fixed; /* Feste Positionierung */
+            bottom: 20px;
+            left: 20px;
+            background-color: rgba(40, 42, 54, 0.8); /* Transparenter Hintergrund */
+            padding: 10px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            z-index: 10; /* Sicherstellen, dass es über dem Graphen liegt */
+        }
 
-// Funktion zum Erstellen eines Baum-Items
-function createTreeItem(node, parentElement, type) {
-    const itemDiv = document.createElement('div');
-    itemDiv.classList.add('tree-item');
-    itemDiv.textContent = node.label;
-    itemDiv.addEventListener('click', (event) => {
-        event.stopPropagation();
-        selectNodeInGraph(node.id);
-    });
-    parentElement.appendChild(itemDiv);
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
 
-    if (type === 'sub') {
-        const toolNodes = networkData.nodes.get({
-            filter: toolNode => networkData.edges.get({
-                filter: edge => edge.from === node.id && toolNode.group === 'tools'
-            }).map(edge => edge.to).includes(toolNode.id)
+        .legend-color {
+            width: 22px;
+            height: 22px;
+            margin-right: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 3px;
+        }
+
+        .tree-folder {
+            margin-bottom: 10px;
+        }
+
+        .tree-folder-title {
+            font-weight: bold;
+            cursor: pointer;
+            color: var(--text-color);
+            font-size: 15px;
+            white-space: nowrap;
+            position: relative;
+            padding-left: 25px;
+            transition: color 0.2s ease-in-out;
+        }
+
+        .tree-folder-title:hover {
+            color: var(--highlight-color);
+        }
+
+        .tree-folder-content {
+            padding-left: 25px;
+            display: none;
+        }
+
+        .tree-item {
+            padding: 5px 0;
+            cursor: pointer;
+            font-size: 14px;
+            white-space: nowrap;
+            position: relative;
+            padding-left: 25px;
+            transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out;
+        }
+
+        .tree-item:hover {
+            background-color: rgba(98, 114, 164, 0.2); /* Leichter Hover-Effekt */
+            color: var(--highlight-color);
+        }
+
+        /* Linien für die Baumstruktur */
+        .tree-folder-title::before,
+        .tree-item::before {
+            content: '';
+            position: absolute;
+            top: 6px; /* Angepasst für bessere vertikale Zentrierung */
+            left: 0;
+            height: calc(100% - 6px); /* Verkürzt, um Lücken zu vermeiden */
+            width: 0;
+            border-left: 1px solid var(--border-color);
+        }
+
+        .tree-folder-title::after,
+        .tree-item::after {
+            content: '';
+            position: absolute;
+            top: 12px; /* Angepasst für bessere vertikale Zentrierung */
+            left: 0;
+            width: 20px;
+            height: 0;
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* Korrigierte Regel für die letzte Linie */
+        .tree-folder:last-child > .tree-folder-title::before,
+        .tree-folder-content > .tree-item:last-child::before {
+            height: 12px; /* Geht nur bis zur Mitte des letzten Elements */
+        }
+    </style>
+    <style> /* Spezifische Stile für vis-network Anpassung */
+        .vis-network {
+            background-color: transparent !important; /* Hintergrund transparent machen */
+        }
+        .vis-navigation {
+            opacity: 0.8; /* Weniger auffällig */
+        }
+        .vis-navigation:hover {
+            opacity: 1;
+        }
+        .vis-node {
+            outline: none; /* Entfernt den Fokus-Outline */
+        }
+    </style>
+</head>
+<body>
+    <div id="graph-container"></div>
+    <div id="sidebar">
+        <div id="tree-view"></div>
+        <div id="info-box-container">
+            <h2>Details</h2>
+            <div id="info-content"></div>
+        </div>
+    </div>
+    <div id="legend">
+        <div class="legend-item"><div class="legend-color" style="background-color: #FF6B6B"></div>Zentral</div>
+        <div class="legend-item"><div class="legend-color" style="background-color: #4ECDC4"></div>Hauptinteressen</div>
+        <div class="legend-item"><div class="legend-color" style="background-color: #96CEB4"></div>Unterpunkte</div>
+        <div class="legend-item"><div class="legend-color" style="background-color: #FFEEAD"></div>Tools</div>
+    </div>
+<script type="module">
+  import { nodes as nodeData, edges as edgeData } from './nodes_data.js';
+
+  const nodes = new vis.DataSet(nodeData);
+  const edges = new vis.DataSet(edgeData);
+
+  const container = document.getElementById('graph-container');
+  const data = { nodes: nodes, edges: edges };
+  const options = {
+      nodes: {
+          shape: 'dot',
+          size: 20,
+          font: {
+              size: 16,
+              face: 'arial',
+              color: '#f8f8f2'
+          },
+          borderWidth: 2,
+          shadow: true,
+          color: {
+              border: '#8BE9FD'
+          },
+          highlight: {
+              borderWidth: 4
+          }
+      },
+      edges: {
+          width: 2,
+          smooth: {
+              type: 'continuous'
+          },
+          arrows: {
+              to: { enabled: true, scaleFactor: 0.5 }
+          },
+          color: {
+              color: '#6272a4',
+              highlight: '#f8f8f2',
+              hover: '#f8f8f2'
+          }
+      },
+      groups: {
+          center: {
+              color: { background: '#FF6B6B', border: '#E64A4A' }
+          },
+          main: {
+              color: { background: '#4ECDC4', border: '#3CA39B' }
+          },
+          sub: {
+              color: { background: '#96CEB4', border: '#75A18D' }
+          },
+          tools: {
+              color: { background: '#FFEEAD', border: '#E6D785' }
+          },
+      },
+      physics: {
+          enabled: true,
+          barnesHut: {
+              gravitationalConstant: -3000,
+              centralGravity: 0.3,
+              springLength: 150,
+              springConstant: 0.04,
+              damping: 0.09,
+              avoidOverlap: 0.5
+          }
+      },
+      interaction: {
+          hover: true,
+          zoomView: true,
+          dragView: true,
+          multiselect: false,
+          navigationButtons: true /* Navigation Buttons aktivieren */
+      }
+  };
+
+  const network = new vis.Network(container, data, options);
+
+    function createTreeView() {
+        const treeView = document.getElementById('tree-view');
+        treeView.innerHTML = '';
+
+        const mainNodes = nodes.get({
+            filter: function (node) {
+                return node.group === 'main';
+            }
         });
-        toolNodes.forEach(toolNode => createTreeItem(toolNode, itemDiv, 'tool')); // Beachten Sie die Übergabe von itemDiv als parentElement
+
+        mainNodes.forEach(mainNode => {
+            const folder = createTreeFolder(mainNode);
+            treeView.appendChild(folder);
+        });
     }
-}
 
-// Funktion zum Ein- und Ausklappen des Ordnerinhalts
-function toggleFolderContent(contentElement) {
-    contentElement.style.display = contentElement.style.display === 'none' ? 'block' : 'none';
-}
+    function createTreeFolder(mainNode) {
+        const folder = document.createElement('div');
+        folder.classList.add('tree-folder');
+        folder.innerHTML = `
+            <div class="tree-folder-title">${mainNode.label}</div>
+            <div class="tree-folder-content"></div>
+        `;
 
-// Funktion zum Auswählen eines Knotens im Graphen
-function selectNodeInGraph(nodeId) {
-    network.selectNodes([nodeId]);
-    network.focus(nodeId, {
-        scale: 1.2,
-        animation: { duration: 500, easingFunction: 'easeInOutQuad' }
-    });
-    showInfo(networkData.nodes.get(nodeId));
-}
+        const subNodes = nodes.get({
+            filter: function (subNode) {
+                return edges.get({
+                    filter: function (edge) {
+                        return edge.from === mainNode.id && subNode.group === 'sub';
+                    }
+                }).map(edge => edge.to).includes(subNode.id);
+            }
+        });
 
-// Funktion zum Anzeigen der Knoteninformationen
-function showInfo(node) {
-    infoContent.innerHTML = '';
-    const title = document.createElement('h3');
-    title.textContent = node.label;
-    infoContent.appendChild(title);
+        subNodes.forEach(subNode => {
+            const subItem = createTreeItem(subNode);
+            folder.querySelector('.tree-folder-content').appendChild(subItem);
 
-    if (node.group === 'sub' || node.group === 'tools') {
+            const toolNodes = nodes.get({
+                filter: function (toolNode) {
+                    return edges.get({
+                        filter: function (edge) {
+                            return edge.from === subNode.id && toolNode.group === 'tools';
+                        }
+                    }).map(edge => edge.to).includes(toolNode.id);
+                }
+            });
+
+            toolNodes.forEach(toolNode => {
+                const toolItem = createTreeItem(toolNode);
+                subItem.appendChild(toolItem);
+            });
+        });
+
+        folder.querySelector('.tree-folder-title').addEventListener('click', function(event) {
+            event.stopPropagation();
+            const content = this.nextElementSibling;
+            content.style.display = content.style.display === 'none' ? 'block' : 'none';
+        });
+
+        return folder;
+    }
+
+    function createTreeItem(node) {
+        const item = document.createElement('div');
+        item.classList.add('tree-item');
+        item.innerHTML = `
+            <div>${node.label}</div>
+        `;
+
+        item.addEventListener('click', function(event) {
+            event.stopPropagation();
+            selectNodeInGraph(node.id);
+        });
+
+        return item;
+    }
+
+    function selectNodeInGraph(nodeId) {
+        network.selectNodes([nodeId]);
+        network.focus(nodeId, {
+            scale: 0.8, // Etwas herausgezoomt
+            animation: {
+                duration: 500,
+                easingFunction: 'easeInOutQuad'
+            }
+        });
+        showInfo(nodes.get(nodeId));
+    }
+
+    function showInfo(node) {
+      const infoContent = document.getElementById('info-content');
+      infoContent.innerHTML = '';
+
+      const title = document.createElement('h3');
+      title.textContent = node.label;
+      infoContent.appendChild(title);
+
+      if (node.group === 'sub' || node.group === 'tools') {
         const description = document.createElement('p');
         description.textContent = node.title || 'Keine Beschreibung verfügbar.';
         infoContent.appendChild(description);
+      }
     }
-}
 
-// Event Listener für Klicks auf den Graphen
-network.on("click", function(params) {
-    if (params.nodes.length > 0) {
-        const nodeId = params.nodes[0];
-        // Knoten hervorheben
-        networkData.nodes.update({ id: nodeId, borderWidth: 4 });
-        // Alle anderen Knoten zurücksetzen
-        networkData.nodes.getIds().filter(id => id !== nodeId).forEach(id => {
-            networkData.nodes.update({ id: id, borderWidth: 2 });
-        });
-        showInfo(networkData.nodes.get(nodeId));
-    } else {
-        // Falls außerhalb eines Knotens geklickt wird
-        networkData.nodes.getIds().forEach(id => {
-            networkData.nodes.update({ id: id, borderWidth: 2 });
-        });
-        infoContent.innerHTML = '';
-    }
-});
+    network.on("click", function(params) {
+        if (params.nodes.length > 0) {
+            const nodeId = params.nodes[0];
+            nodes.update({id: nodeId, borderWidth: 4});
+            nodes.getIds().filter(id => id !== nodeId).forEach(id => {
+                nodes.update({id: id, borderWidth: 2});
+            });
+            showInfo(nodes.get(nodeId));
+        } else {
+            nodes.getIds().forEach(id => {
+                nodes.update({id: id, borderWidth: 2});
+            });
+            document.getElementById('info-content').innerHTML = '';
+        }
+    });
 
-// Initialisiere die Baumansicht
-createTreeView();
+    createTreeView();
+</script>
+</body>
+</html>
