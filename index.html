@@ -151,36 +151,39 @@
             height: 12px; /* Geht nur bis zur Mitte des letzten Elements */
         }
 
-        @media (max-width: 768px) {
-          body {
-            flex-direction: column;
-          }
+@media (max-width: 768px) {
+  body {
+    flex-direction: column; /* Vertikale Anordnung */
+  }
 
-          #graph-container {
-            width: 100%;
-            height: 50vh;
-            border-right: none;
-            border-bottom: 1px solid var(--border-color);
-          }
+  #graph-container {
+    width: 100%;
+    height: 60vh; /* Graph nimmt 60% der Viewport-Höhe ein */
+    border-right: none;
+    border-bottom: 1px solid var(--border-color);
+  }
 
-          #sidebar {
-            width: 100%;
-            flex-direction: row;
-          }
+  #sidebar {
+    width: 100%;
+    flex-direction: row; /* Horizontale Anordnung in der Sidebar */
+    height: 40vh; /* Sidebar nimmt die restlichen 40% ein */
+  }
 
-          #tree-view {
-            width: 50%;
-            height: auto;
-            border-bottom: none;
-            border-right: 1px solid var(--border-color);
-          }
+  #tree-view {
+    flex: 1; /* Wächst und schrumpft flexibel, nimmt aber mindestens 30% ein*/
+    height: 100%; /* Volle Höhe der Sidebar */
+    border-bottom: none;
+    border-right: 1px solid var(--border-color);
+    overflow-y: auto; /* Scrollbar, falls der Inhalt zu hoch ist */
+  }
 
-          #info-box-container {
-            width: 50%;
-            height: auto;
-            border-bottom: 1px solid var(--border-color);
-          }
-        }
+  #info-box-container {
+    flex: 1; /* Wächst und schrumpft flexibel */
+    height: 100%; /* Volle Höhe der Sidebar */
+    border-bottom: none;
+    overflow-y: auto; /* Scrollbar, falls der Inhalt zu hoch ist */
+  }
+}
         
     </style>
     <style> /* Spezifische Stile für vis-network Anpassung */
