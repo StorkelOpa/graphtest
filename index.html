@@ -7,25 +7,28 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.6/dist/dist/vis-network.min.css" rel="stylesheet" type="text/css" />
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.6/dist/vis-network.min.js"></script>
     <style>
-               body {
+        body {
             background-color: #222;
             color: #eee;
             font-family: 'Arial', sans-serif;
-            display: flex; /* Flexbox für das Layout verwenden */
+            display: flex;
+            flex-direction: column; /* Hauptlayout vertikal */
+            height: 100vh; /* Volle Viewport-Höhe */
+            margin: 0; /* Standard-Margins entfernen */
         }
         #graph-container {
-            width: 70%; /* Mehr Platz für den Graphen */
-            height: 800px;
+            flex: 1; /* Graph nimmt den verfügbaren Platz ein */
             border: 1px solid #444;
             background-color: #333;
         }
         #sidebar {
-            width: 30%; /* Breite für Baumansicht und Infobox */
+            width: 100%; /* Sidebar nimmt volle Breite ein */
             display: flex;
-            flex-direction: column; /* Baumansicht und Infobox untereinander anordnen */
+            flex-direction: row; /* Baum und Info nebeneinander */
+            height: 400px; /* Feste Höhe für die Sidebar */
         }
         #tree-view {
-            height: 400px; /* Höhe der Baumansicht */
+            flex: 1; /* Baumansicht und Infobox teilen sich den Platz */
             background-color: #0f0f0f;
             border: 1px solid #444;
             overflow-y: auto;
@@ -33,7 +36,7 @@
             padding-left: 10px;
         }
         #info-box-container {
-            height: 400px; /* Höhe der Infobox */
+            flex: 1; /* Baumansicht und Infobox teilen sich den Platz */
             background-color: #0f0f0f;
             border: 1px solid #444;
             overflow-y: auto;
@@ -41,8 +44,8 @@
         }
         #legend {
             position: absolute;
-            bottom: 10px;
-            left: 10px;
+            top: 10px;    /* Oben positionieren */
+            right: 10px;  /* Rechts positionieren */
             background-color: #282c34;
             padding: 10px;
             border: 1px solid #444;
@@ -68,11 +71,11 @@
             color: #eee;
             font-size: 14px;
             white-space: nowrap;
-            position: relative; /* Für die Positionierung der Linie */
-            padding-left: 20px; /* Platz für die Linie */
+            position: relative;
+            padding-left: 20px;
         }
         .tree-folder-content {
-            padding-left: 40px; /* Mehr Einzug für Unterpunkte */
+            padding-left: 40px;
             display: none;
             color: #eee;
             font-size: 14px;
@@ -82,13 +85,12 @@
             cursor: default;
             font-size: 12px;
             white-space: nowrap;
-            position: relative; /* Für die Positionierung der Linie */
-            padding-left: 20px; /* Platz für die Linie */
+            position: relative;
+            padding-left: 20px;
         }
         .tree-item > .tree-item {
             padding-left: 40px;
         }
-        /* Linien für die Baumstruktur */
         .tree-folder-title::before,
         .tree-item::before {
             content: '';
@@ -109,13 +111,10 @@
             height: 0;
             border-top: 1px solid #444;
         }
-
-        /* Korrigierte Regel für die letzte Linie */
         .tree-folder:last-child > .tree-folder-title::before,
         .tree-folder-content > .tree-item:last-child::before {
-            height: 50%; /* Die letzte Linie nur bis zur Mitte zeichnen */
+            height: 50%;
         }
-
     </style>
 </head>
 <body>
