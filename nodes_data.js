@@ -4,15 +4,17 @@ const nodesData = [
     { id: 1, label: 'Hobby A', group: 'main', size: 25 },
     { id: 2, label: 'Hobby B', group: 'main', size: 25 },
     { id: 3, label: 'Interesse C', group: 'main', size: 25 },
-    { id: 4, label: 'Aspekt A1', group: 'sub' },
-    { id: 5, label: 'Aspekt A2', group: 'sub' },
-    { id: 6, label: 'Tool A1', group: 'tools' },
-    { id: 7, label: 'Aspekt B1', group: 'sub' },
-    { id: 8, label: 'Aspekt B2', group: 'sub' },
-    { id: 9, label: 'Tool B1', group: 'tools' },
-    { id: 10, label: 'Tool B2', group: 'tools' },
-    { id: 11, label: 'Aspekt C1', group: 'sub' },
-    { id: 12, label: 'Aspekt C2', group: 'sub' },
+    { id: 4, label: 'Aspekt A1', group: 'sub', title: 'Details zu Aspekt A1' },
+    { id: 5, label: 'Aspekt A2', group: 'sub', title: 'Weitere Details zu Aspekt A2' },
+    { id: 6, label: 'Tool A1', group: 'tools', title: 'Nützliches Tool für Aspekt A1' },
+    { id: 7, label: 'Aspekt B1', group: 'sub', title: 'Wichtiger Aspekt von Hobby B' },
+    { id: 8, label: 'Aspekt B2', group: 'sub', title: 'Ein weiterer Aspekt von Hobby B' },
+    { id: 9, label: 'Tool B1', group: 'tools', title: 'Hilfreiches Tool für Hobby B' },
+    { id: 10, label: 'Tool B2', group: 'tools', title: 'Ein anderes Tool für Hobby B' },
+    { id: 11, label: 'Aspekt C1', group: 'sub', title: 'Erster Aspekt von Interesse C' },
+    { id: 12, label: 'Aspekt C2', group: 'sub', title: 'Zweiter Aspekt von Interesse C' },
+    { id: 13, label: 'Tool C1', group: 'tools', title: 'Tool, das bei Interesse C hilft' },
+    { id: 14, label: 'Tool C2', group: 'tools', title: 'Ein weiteres nützliches Tool für Interesse C' },
 ];
 
 const edgesData = [
@@ -28,11 +30,10 @@ const edgesData = [
     { from: 7, to: 10 },
     { from: 3, to: 11 },
     { from: 3, to: 12 },
+    { from: 11, to: 13 },
+    { from: 11, to: 14 },
 ];
 
-// Erstelle die vis.DataSet Objekte
-const nodes = new vis.DataSet(nodesData);
-const edges = new vis.DataSet(edgesData);
-
 // Exportiere die Daten, damit sie in der index.html importiert werden können
-export { nodes, edges };
+export const nodes = nodesData;
+export const edges = edgesData;
