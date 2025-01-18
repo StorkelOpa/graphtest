@@ -150,6 +150,38 @@
         .tree-folder-content > .tree-item:last-child::before {
             height: 12px; /* Geht nur bis zur Mitte des letzten Elements */
         }
+
+        @media (max-width: 768px) {
+          body {
+            flex-direction: column;
+          }
+
+          #graph-container {
+            width: 100%;
+            height: 50vh;
+            border-right: none;
+            border-bottom: 1px solid var(--border-color);
+          }
+
+          #sidebar {
+            width: 100%;
+            flex-direction: row;
+          }
+
+          #tree-view {
+            width: 50%;
+            height: auto;
+            border-bottom: none;
+            border-right: 1px solid var(--border-color);
+          }
+
+          #info-box-container {
+            width: 50%;
+            height: auto;
+            border-bottom: 1px solid var(--border-color);
+          }
+        }
+        
     </style>
     <style> /* Spezifische Stile für vis-network Anpassung */
         .vis-network {
