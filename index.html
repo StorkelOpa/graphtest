@@ -152,40 +152,125 @@
             height: 12px; /* Geht nur bis zur Mitte des letzten Elements */
         }
 
+/* Basis-Mobile-Styles */
 @media (max-width: 768px) {
   body {
-    flex-direction: column; /* Vertikale Anordnung */
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
   }
 
   #graph-container {
-    width: 100%;
-    height: 60vh; /* Graph nimmt 60% der Viewport-Höhe ein */
-    border-right: none;
-    border-bottom: 1px solid var(--border-color);
+    height: 50vh; /* Reduziert von 60vh auf 50vh für bessere Balance */
+    min-height: 300px; /* Minimalhöhe sicherstellen */
   }
 
   #sidebar {
-    width: 100%;
-    flex-direction: row; /* Horizontale Anordnung in der Sidebar */
-    height: 40vh; /* Sidebar nimmt die restlichen 40% ein */
+    height: 50vh;
+    overflow: hidden;
   }
 
-  #tree-view {
-    flex: 1; /* Wächst und schrumpft flexibel, nimmt aber mindestens 30% ein*/
-    height: 100%; /* Volle Höhe der Sidebar */
-    border-bottom: none;
-    border-right: 1px solid var(--border-color);
-    overflow-y: auto; /* Scrollbar, falls der Inhalt zu hoch ist */
+  #tree-view, #info-box-container {
+    padding: 10px;
+    height: 100%;
   }
 
-  #info-box-container {
-    flex: 1; /* Wächst und schrumpft flexibel */
-    height: 100%; /* Volle Höhe der Sidebar */
-    border-bottom: none;
-    overflow-y: auto; /* Scrollbar, falls der Inhalt zu hoch ist */
+  /* Verbesserte Scrollbarkeit */
+  #tree-view, #info-box-container {
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling auf iOS */
+    scrollbar-width: thin;
+  }
+
+  /* Anpassungen für das Legend */
+  #legend {
+    top: 10px;
+    left: 10px;
+    font-size: 12px;
+    padding: 8px;
+    background-color: rgba(40, 42, 54, 0.95);
+  }
+
+  .legend-item {
+    margin-bottom: 4px;
+  }
+
+  .legend-color {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* Verbesserte Touch-Targets */
+  .tree-item, .tree-folder-title {
+    padding: 8px 0 8px 25px;
+    min-height: 44px; /* Apple's empfohlene Mindesthöhe für Touch-Targets */
+    display: flex;
+    align-items: center;
   }
 }
-        
+
+/* Zusätzliche Anpassungen für sehr kleine Bildschirme */
+@media (max-width: 480px) {
+  #graph-container {
+    height: 40vh;
+  }
+
+  #sidebar {
+    height: 60vh;
+  }
+
+  /* Kleinere Schriftgrößen */
+  .tree-folder-title {
+    font-size: 14px;
+  }
+
+  .tree-item {
+    font-size: 13px;
+  }
+
+  /* Kompakteres Legend */
+  #legend {
+    max-width: 120px;
+    font-size: 11px;
+  }
+}
+
+/* Landscape-Orientierung */
+@media (max-width: 768px) and (orientation: landscape) {
+  #graph-container {
+    height: 60vh;
+  }
+
+  #sidebar {
+    height: 40vh;
+    flex-direction: row;
+  }
+
+  #tree-view, #info-box-container {
+    width: 50%;
+    height: 100%;
+  }
+}
+
+/* Verbesserte Scrollbar-Darstellung */
+#tree-view::-webkit-scrollbar,
+#info-box-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+#tree-view::-webkit-scrollbar-thumb,
+#info-box-container::-webkit-scrollbar-thumb {
+  background-color: var(--accent-color);
+  border-radius: 3px;
+}
+
+/* Touch-Optimierte Hover-Effekte */
+@media (hover: none) {
+  .tree-item:active,
+  .tree-folder-title:active {
+    background-color: rgba(98, 114, 164, 0.3);
+    color: var(--highlight-color);
+  }
+}        
     </style>
     <style> /* Spezifische Stile für vis-network Anpassung */
         .vis-network {
