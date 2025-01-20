@@ -136,12 +136,3 @@ Bei großen Datensätzen:
 ## Lizenz
 
 Dieses Projekt ist unter der MIT-Lizenz lizenziert - siehe die [LICENSE](LICENSE) Datei für Details.
-
-## Kontakt
-
-Projektname - [Repository-Link]
-
-## Danksagung
-
-- [vis.js](https://visjs.org/) für die Graphenvisualisierung
-- [Dracula Theme](https://draculatheme.com/) für das Farbschema
