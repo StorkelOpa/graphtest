@@ -152,7 +152,7 @@
             height: 12px; /* Geht nur bis zur Mitte des letzten Elements */
         }
 
-/* Basis-Mobile-Styles */
+/* Mobile-Styles mit horizontalem Sidebar-Layout */
 @media (max-width: 768px) {
   body {
     flex-direction: column;
@@ -161,27 +161,49 @@
   }
 
   #graph-container {
-    height: 50vh; /* Reduziert von 60vh auf 50vh für bessere Balance */
-    min-height: 300px; /* Minimalhöhe sicherstellen */
+    height: 50vh;
+    min-height: 300px;
+    width: 100%;
+    border-bottom: 1px solid var(--border-color);
   }
 
   #sidebar {
     height: 50vh;
-    overflow: hidden;
+    width: 100%;
+    display: flex;
+    flex-direction: row; /* Horizontales Layout */
   }
 
-  #tree-view, #info-box-container {
-    padding: 10px;
+  #tree-view {
+    flex: 1;
     height: 100%;
+    border-right: 1px solid var(--border-color);
+    border-bottom: none;
+    overflow-y: auto;
+    padding: 10px;
   }
 
-  /* Verbesserte Scrollbarkeit */
+  #info-box-container {
+    flex: 1;
+    height: 100%;
+    overflow-y: auto;
+    padding: 10px;
+  }
+
+  /* Touch-Optimierung */
   #tree-view, #info-box-container {
-    -webkit-overflow-scrolling: touch; /* Smooth scrolling auf iOS */
+    -webkit-overflow-scrolling: touch;
     scrollbar-width: thin;
   }
 
-  /* Anpassungen für das Legend */
+  .tree-item, .tree-folder-title {
+    padding: 8px 0 8px 25px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+
+  /* Legend Anpassungen */
   #legend {
     top: 10px;
     left: 10px;
@@ -198,17 +220,9 @@
     width: 16px;
     height: 16px;
   }
-
-  /* Verbesserte Touch-Targets */
-  .tree-item, .tree-folder-title {
-    padding: 8px 0 8px 25px;
-    min-height: 44px; /* Apple's empfohlene Mindesthöhe für Touch-Targets */
-    display: flex;
-    align-items: center;
-  }
 }
 
-/* Zusätzliche Anpassungen für sehr kleine Bildschirme */
+/* Sehr kleine Bildschirme */
 @media (max-width: 480px) {
   #graph-container {
     height: 40vh;
@@ -218,7 +232,6 @@
     height: 60vh;
   }
 
-  /* Kleinere Schriftgrößen */
   .tree-folder-title {
     font-size: 14px;
   }
@@ -227,14 +240,18 @@
     font-size: 13px;
   }
 
-  /* Kompakteres Legend */
   #legend {
     max-width: 120px;
     font-size: 11px;
   }
+
+  /* Anpassungen für sehr schmale Bildschirme */
+  #tree-view, #info-box-container {
+    padding: 8px;
+  }
 }
 
-/* Landscape-Orientierung */
+/* Landscape-Modus Optimierungen */
 @media (max-width: 768px) and (orientation: landscape) {
   #graph-container {
     height: 60vh;
@@ -242,16 +259,10 @@
 
   #sidebar {
     height: 40vh;
-    flex-direction: row;
-  }
-
-  #tree-view, #info-box-container {
-    width: 50%;
-    height: 100%;
   }
 }
 
-/* Verbesserte Scrollbar-Darstellung */
+/* Scrollbar-Styling */
 #tree-view::-webkit-scrollbar,
 #info-box-container::-webkit-scrollbar {
   width: 6px;
@@ -270,7 +281,7 @@
     background-color: rgba(98, 114, 164, 0.3);
     color: var(--highlight-color);
   }
-}        
+}
     </style>
     <style> /* Spezifische Stile für vis-network Anpassung */
         .vis-network {
