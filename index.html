@@ -197,10 +197,37 @@
   }
 
   .tree-item, .tree-folder-title {
-    padding: 8px 0 8px 25px;
-    min-height: 44px;
+    padding: 6px 0 6px 25px;
+    min-height: 32px;
+    display: block;
+    font-size: 13px;
+    line-height: 1.3;
+  }
+
+  .tree-folder-title {
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .tree-folder-content {
+    display: none;
+    flex-direction: column;
+  }
+
+  .tree-folder-content.open {
     display: flex;
-    align-items: center;
+  }
+
+  /* Verbesserte Einrückung für Unterpunkte */
+  .tree-folder-content .tree-item {
+    padding-left: 35px;
+    font-size: 12px;
+  }
+
+  /* Zusätzliche Einrückung für Tool-Items */
+  .tree-folder-content .tree-item .tree-item {
+    padding-left: 45px;
+    font-size: 11px;
   }
 
   /* Legend Anpassungen */
