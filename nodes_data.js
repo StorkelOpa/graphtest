@@ -1,5 +1,5 @@
 // Daten für den Graphen (nodes und edges)
-const nodesData = [
+const nodes = [
     { id: 0, label: 'Zentral', description: 'Meine Interessen konzentrieren sich hauptsächlich auf den digitalen Bereich und umfassen eine breite Palette von Medien, wobei das Buch die primäre Ausnahme im Analogen darstellt. Der Ursprung dieser Interessen liegt in der Begeisterung für Computerspiele und Dokumentationen in meiner Jugend. Strategie-Spiele wie die Total War Reihe, mit ihren Weltkarten und der Planung von Städten, weckten früh mein Interesse an Stadtplanung und GIS.' },
     { id: 1, label: 'Outdoor', description: 'Das "Draußen sein" dient mir als wichtiger Ausgleich zur intensiven Bildschirmarbeit. Aufgewachsen in einer ländlichen Region, verbrachte ich viel Zeit in der Natur, bevor die digitale Welt mich in ihren Bann zog. Das Bauen von Hütten im Wald und das Erkunden der Umgebung mit Geschwistern und Freunden prägten diese Zeit.' },
     { id: 2, label: 'Medien', description: 'Meine Faszination für Medien liegt vor allem in der Art und Weise, wie sie Wissen aufbereiten und weitergeben. Jeder Mensch hat einen individuellen Mediengeschmack, der durch die Sozialisation geprägt ist, und einen eigenen Umgang damit, der oft Einblicke in die Medienkompetenz gibt. Besonders interessant finde ich die Selbstreflexion über meinen eigenen Medienkonsum und die Analyse, warum mich ein bestimmtes Spiel, ein Film oder eine Serie begeistert.' },
@@ -41,7 +41,7 @@ const nodesData = [
     { id: 503, label: 'Projekte', description: 'Um meine Fähigkeiten in React und Three.js zu verbessern, arbeite ich aktiv an verschiedenen Projekten, um das Gelernte praktisch anzuwenden und zu festigen.' },
 ];
 
-const edgesData = [
+const edges = [
     { from: 0, to: 1 },
     { from: 0, to: 2 },
     { from: 0, to: 3 },
