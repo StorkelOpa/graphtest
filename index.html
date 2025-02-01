@@ -367,28 +367,27 @@
 const options = {
   nodes: {
     shape: 'dot',
-    // Globale Skalierungseinstellungen – diese werden in den Gruppeneinstellungen jeweils überschrieben
     scaling: {
       min: 10,
-      max: 25, // Maximalgröße insgesamt etwas reduziert
+      max: 25,
       label: {
         enabled: true,
         min: 10,
         max: 20,
         maxVisible: 20,
-        drawThreshold: 0  // Labels sind immer sichtbar
+        drawThreshold: 0  // Alle Labels immer anzeigen
       }
     },
     borderWidth: 2,
     shadow: true,
     font: {
       face: 'Arial',
-      color: '#ffffff'  // Helle Schriftfarbe
+      color: '#ffffff'
     }
   },
   groups: {
     center: {
-      size: 20,  // Zentrale Nodes: moderat groß
+      size: 20,  // Größte Gruppe
       scaling: {
         label: {
           drawThreshold: 0,
@@ -397,11 +396,9 @@ const options = {
           maxVisible: 20
         }
       },
-      // Verwende den ersten und fünften Farbton aus der Palette:
-      // Hintergrund: #332973, Border: #F2786D
       color: {
-        background: '#332973',
-        border: '#F2786D'
+        background: '#332973', // dunkles Violett-Blau
+        border: '#F2786D'      // warmes Lachsrosa
       },
       font: {
         size: 18,
@@ -410,7 +407,7 @@ const options = {
       }
     },
     main: {
-      size: 18,  // Hauptknoten etwas kleiner
+      size: 18,
       scaling: {
         label: {
           drawThreshold: 0,
@@ -419,11 +416,9 @@ const options = {
           maxVisible: 18
         }
       },
-      // Verwende den zweiten und dritten Farbton:
-      // Hintergrund: #143D73, Border: #0AA6A6
       color: {
-        background: '#143D73',
-        border: '#0AA6A6'
+        background: '#143D73', // dunkles Blau
+        border: '#0AA6A6'      // kräftiges Cyan
       },
       font: {
         size: 16,
@@ -432,7 +427,7 @@ const options = {
       }
     },
     sub: {
-      size: 16,  // Noch etwas kleinere Knoten
+      size: 16,
       scaling: {
         label: {
           drawThreshold: 0,
@@ -441,11 +436,9 @@ const options = {
           maxVisible: 16
         }
       },
-      // Für die Sub-Knoten: Hintergrund den dritten Farbton und als Border den vierten Farbton verwenden
-      // Hintergrund: #0AA6A6, Border: #F2BC79
       color: {
-        background: '#0AA6A6',
-        border: '#F2BC79'
+        background: '#0AA6A6', // kräftiges Cyan
+        border: '#F2BC79'      // warmes Gold
       },
       font: {
         size: 14,
@@ -453,8 +446,28 @@ const options = {
         color: '#ffffff'
       }
     },
+    aspect: {
+      size: 15,  // Neu: 1 über tools
+      scaling: {
+        label: {
+          drawThreshold: 0,
+          min: 10,
+          max: 15,
+          maxVisible: 15
+        }
+      },
+      color: {
+        background: '#F2786D', // Lachsrosa
+        border: '#143D73'      // dunkles Blau (für guten Kontrast)
+      },
+      font: {
+        size: 14,
+        face: 'Tahoma',
+        color: '#ffffff'
+      }
+    },
     tools: {
-      size: 14,  // Die kleinsten Knoten für Tools
+      size: 14,  // Kleinste Gruppe
       scaling: {
         label: {
           drawThreshold: 0,
@@ -463,11 +476,9 @@ const options = {
           maxVisible: 14
         }
       },
-      // Für Tools: Hintergrund den vierten Farbton und als Border erneut den fünften Farbton verwenden
-      // Hintergrund: #F2BC79, Border: #F2786D
       color: {
-        background: '#F2BC79',
-        border: '#F2786D'
+        background: '#F2BC79', // warmes Gold
+        border: '#0AA6A6'      // kräftiges Cyan
       },
       font: {
         size: 12,
@@ -508,6 +519,7 @@ const options = {
     multiselect: false
   }
 };
+
 
   const network = new vis.Network(container, data, options);
 
