@@ -10,7 +10,7 @@ export const options = {
         min: 10,
         max: 20,
         maxVisible: 20,
-        drawThreshold: 0  // Labels immer anzeigen
+        drawThreshold: 0  // Alle Labels werden immer angezeigt
       }
     },
     borderWidth: 2,
@@ -22,7 +22,7 @@ export const options = {
   },
   groups: {
     center: {
-      size: 20,  // Größte Gruppe
+      size: 20,  // Größte Gruppe (innerhalb)
       scaling: {
         label: {
           drawThreshold: 0,
@@ -32,8 +32,8 @@ export const options = {
         }
       },
       color: {
-        background: '#332973', // dunkles Violett-Blau
-        border: '#F2786D'      // warmes Lachsrosa
+        background: '#F2786D', // Start: #F2786D
+        border: '#0D8792'      // Komplementär zu #F2786D
       },
       font: {
         size: 18,
@@ -52,8 +52,8 @@ export const options = {
         }
       },
       color: {
-        background: '#143D73', // dunkles Blau
-        border: '#0AA6A6'      // kräftiges Cyan
+        background: '#F2BC79', // Zweiter Farbton in der Reihenfolge
+        border: '#0D4386'      // Komplementär zu #F2BC79
       },
       font: {
         size: 16,
@@ -72,8 +72,8 @@ export const options = {
         }
       },
       color: {
-        background: '#0AA6A6', // kräftiges Cyan
-        border: '#F2BC79'      // warmes Gold
+        background: '#0AA6A6', // Dritter Farbton
+        border: '#F55959'      // Komplementär zu #0AA6A6
       },
       font: {
         size: 14,
@@ -92,8 +92,8 @@ export const options = {
         }
       },
       color: {
-        background: '#F2786D', // Lachsrosa
-        border: '#143D73'      // dunkles Blau
+        background: '#143D73', // Vierter Farbton
+        border: '#EBC28C'      // Komplementär zu #143D73
       },
       font: {
         size: 14,
@@ -102,7 +102,7 @@ export const options = {
       }
     },
     tools: {
-      size: 14,  // Kleinste Gruppe
+      size: 14,  // Kleinste Gruppe (äußerst)
       scaling: {
         label: {
           drawThreshold: 0,
@@ -112,8 +112,8 @@ export const options = {
         }
       },
       color: {
-        background: '#F2BC79', // warmes Gold
-        border: '#0AA6A6'      // kräftiges Cyan
+        background: '#332973', // Fünfter Farbton
+        border: '#CCD68C'      // Komplementär zu #332973
       },
       font: {
         size: 12,
@@ -154,3 +154,4 @@ export const options = {
     multiselect: false
   }
 };
+
