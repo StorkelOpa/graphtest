@@ -349,24 +349,24 @@
             <div id="info-content"></div>
         </div>
     </div>
-    <div id="legend">
-        <div class="legend-item"><div class="legend-color" style="background-color: #FF6B6B"></div>Zentral</div>
-        <div class="legend-item"><div class="legend-color" style="background-color: #4ECDC4"></div>Hauptinteressen</div>
-        <div class="legend-item"><div class="legend-color" style="background-color: #96CEB4"></div>Unterpunkte</div>
-        <div class="legend-item"><div class="legend-color" style="background-color: #FFEEAD"></div>Tools</div>
-    </div>
+    <div id="legend"></div>
+    
 <script type="module">
-  import { nodes as nodeData, edges as edgeData } from './nodes_data.js';
-  import { options } from './options.js';  
+    import { nodes as nodeData, edges as edgeData } from './nodes_data.js';
+    import { options } from './options.js';
+    import { generateLegend } from './legend.js';
 
-  const nodes = new vis.DataSet(nodeData);
-  const edges = new vis.DataSet(edgeData);
+ // Erstelle den Graphen
+    const nodes = new vis.DataSet(nodeData);
+    const edges = new vis.DataSet(edgeData);
+    const container = document.getElementById('graph-container');
+    const data = { nodes, edges };
+    const network = new vis.Network(container, data, options);
 
-  const container = document.getElementById('graph-container');
-  const data = { nodes: nodes, edges: edges };
+    // Generiere die Legende anhand der Optionen
+    generateLegend();
 
-  const network = new vis.Network(container, data, options);
-
+    
     function createTreeView() {
         const treeView = document.getElementById('tree-view');
         treeView.innerHTML = '';
