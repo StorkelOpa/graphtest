@@ -365,88 +365,144 @@
   const data = { nodes: nodes, edges: edges };
     
 const options = {
-    nodes: {
-        shape: 'dot',
-        size: 25, // Knotengröße bleibt unverändert
-        scaling: {
-            min: 15,
-            max: 40,
-            label: {
-                enabled: true,
-                min: 12,
-                max: 24,
-                maxVisible: 24,
-                drawThreshold: 14
-            }
-        },
-        font: {
-            size: 18,
-            face: 'Arial',
-            color: '#ffffff' // Helle Schriftfarbe für alle Nodes
-        },
-        borderWidth: 3,
-        shadow: true,
-        color: {
-            border: '#8BE9FD'
-        },
-        highlight: {
-            borderWidth: 5
-        }
-    },
-    groups: {
-        center: {
-            // Erste Farbe der Palette als Hintergrund und die zweite als Rand
-            color: { background: '#014040', border: '#02735E' },
-            font: { color: '#ffffff', size: 20, face: 'Arial' }
-        },
-        main: {
-            // Zweite Farbe als Hintergrund, dritte als Rand
-            color: { background: '#02735E', border: '#03A678' },
-            font: { color: '#ffffff', size: 18, face: 'Helvetica' }
-        },
-        sub: {
-            // Dritte Farbe als Hintergrund, vierte als Rand
-            color: { background: '#03A678', border: '#F27405' },
-            font: { color: '#ffffff', size: 16, face: 'Verdana' }
-        },
-        tools: {
-            // Vierte Farbe als Hintergrund, fünfte als Rand
-            color: { background: '#F27405', border: '#731702' },
-            font: { color: '#ffffff', size: 14, face: 'Tahoma' }
-        }
-    },
-    edges: {
-        width: 2,
-        smooth: {
-            type: 'continuous'
-        },
-        arrows: {
-            to: { enabled: true, scaleFactor: 0.5 }
-        },
-        color: {
-            color: '#6272a4',
-            highlight: '#f8f8f2',
-            hover: '#f8f8f2'
-        }
-    },
-    physics: {
+  nodes: {
+    shape: 'dot',
+    // Allgemeine Skalierungseinstellungen (werden von den Gruppen überschrieben, falls definiert)
+    scaling: {
+      min: 15,
+      max: 40,
+      label: {
         enabled: true,
-        barnesHut: {
-            gravitationalConstant: -3000,
-            centralGravity: 0.3,
-            springLength: 150,
-            springConstant: 0.04,
-            damping: 0.09,
-            avoidOverlap: 0.5
-        }
+        min: 12,
+        max: 24,
+        maxVisible: 24,
+        drawThreshold: 14
+      }
     },
-    interaction: {
-        hover: true,
-        zoomView: true,
-        dragView: true,
-        multiselect: false
+    borderWidth: 3,
+    shadow: true,
+    font: {
+      face: 'Arial',
+      color: '#ffffff'
     }
+  },
+  groups: {
+    center: {
+      size: 30, // Größere Nodes für zentrale Knoten
+      scaling: {
+        label: {
+          // Niedrigere Schwelle, damit Labels auch bei geringem Zoom angezeigt werden
+          drawThreshold: 10,
+          min: 18,
+          max: 30,
+          maxVisible: 30
+        }
+      },
+      color: {
+        background: '#014040',
+        border: '#02735E'
+      },
+      font: {
+        size: 20,
+        face: 'Arial',
+        color: '#ffffff'
+      }
+    },
+    main: {
+      size: 25, // Mittelgroße Nodes
+      scaling: {
+        label: {
+          drawThreshold: 12,
+          min: 16,
+          max: 25,
+          maxVisible: 25
+        }
+      },
+      color: {
+        background: '#02735E',
+        border: '#03A678'
+      },
+      font: {
+        size: 18,
+        face: 'Helvetica',
+        color: '#ffffff'
+      }
+    },
+    sub: {
+      size: 20, // Etwas kleinere Nodes
+      scaling: {
+        label: {
+          drawThreshold: 14,
+          min: 14,
+          max: 20,
+          maxVisible: 20
+        }
+      },
+      color: {
+        background: '#03A678',
+        border: '#F27405'
+      },
+      font: {
+        size: 16,
+        face: 'Verdana',
+        color: '#ffffff'
+      }
+    },
+    tools: {
+      size: 15, // Die kleinsten Nodes für Tools
+      scaling: {
+        label: {
+          // Höhere drawThreshold, damit Labels nur bei näherem Zoom sichtbar werden
+          drawThreshold: 16,
+          min: 12,
+          max: 15,
+          maxVisible: 15
+        }
+      },
+      color: {
+        background: '#F27405',
+        border: '#731702'
+      },
+      font: {
+        size: 14,
+        face: 'Tahoma',
+        color: '#ffffff'
+      }
+    }
+  },
+  edges: {
+    width: 2,
+    smooth: {
+      type: 'continuous'
+    },
+    arrows: {
+      to: { enabled: true, scaleFactor: 0.5 }
+    },
+    color: {
+      color: '#6272a4',
+      highlight: '#f8f8f2',
+      hover: '#f8f8f2'
+    }
+  },
+  physics: {
+    enabled: true,
+    barnesHut: {
+      gravitationalConstant: -3000,
+      centralGravity: 0.3,
+      springLength: 150,
+      springConstant: 0.04,
+      damping: 0.09,
+      avoidOverlap: 0.5
+    }
+  },
+  interaction: {
+    hover: true,
+    zoomView: true,
+    dragView: true,
+    multiselect: false
+  }
 };
+
 
 
 
