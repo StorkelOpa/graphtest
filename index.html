@@ -367,111 +367,117 @@
 const options = {
   nodes: {
     shape: 'dot',
-    // Allgemeine Skalierungseinstellungen (werden von den Gruppen überschrieben, falls definiert)
+    // Globale Skalierungseinstellungen – diese werden in den Gruppeneinstellungen jeweils überschrieben
     scaling: {
-      min: 15,
-      max: 40,
+      min: 10,
+      max: 25, // Maximalgröße insgesamt etwas reduziert
       label: {
         enabled: true,
-        min: 12,
-        max: 24,
-        maxVisible: 24,
-        drawThreshold: 14
+        min: 10,
+        max: 20,
+        maxVisible: 20,
+        drawThreshold: 0  // Labels sind immer sichtbar
       }
     },
-    borderWidth: 3,
+    borderWidth: 2,
     shadow: true,
     font: {
       face: 'Arial',
-      color: '#ffffff'
+      color: '#ffffff'  // Helle Schriftfarbe
     }
   },
   groups: {
     center: {
-      size: 30, // Größere Nodes für zentrale Knoten
+      size: 20,  // Zentrale Nodes: moderat groß
       scaling: {
         label: {
-          // Niedrigere Schwelle, damit Labels auch bei geringem Zoom angezeigt werden
-          drawThreshold: 10,
-          min: 18,
-          max: 30,
-          maxVisible: 30
-        }
-      },
-      color: {
-        background: '#014040',
-        border: '#02735E'
-      },
-      font: {
-        size: 20,
-        face: 'Arial',
-        color: '#ffffff'
-      }
-    },
-    main: {
-      size: 25, // Mittelgroße Nodes
-      scaling: {
-        label: {
-          drawThreshold: 12,
-          min: 16,
-          max: 25,
-          maxVisible: 25
-        }
-      },
-      color: {
-        background: '#02735E',
-        border: '#03A678'
-      },
-      font: {
-        size: 18,
-        face: 'Helvetica',
-        color: '#ffffff'
-      }
-    },
-    sub: {
-      size: 20, // Etwas kleinere Nodes
-      scaling: {
-        label: {
-          drawThreshold: 14,
+          drawThreshold: 0,
           min: 14,
           max: 20,
           maxVisible: 20
         }
       },
+      // Verwende den ersten und fünften Farbton aus der Palette:
+      // Hintergrund: #332973, Border: #F2786D
       color: {
-        background: '#03A678',
-        border: '#F27405'
+        background: '#332973',
+        border: '#F2786D'
+      },
+      font: {
+        size: 18,
+        face: 'Arial',
+        color: '#ffffff'
+      }
+    },
+    main: {
+      size: 18,  // Hauptknoten etwas kleiner
+      scaling: {
+        label: {
+          drawThreshold: 0,
+          min: 12,
+          max: 18,
+          maxVisible: 18
+        }
+      },
+      // Verwende den zweiten und dritten Farbton:
+      // Hintergrund: #143D73, Border: #0AA6A6
+      color: {
+        background: '#143D73',
+        border: '#0AA6A6'
       },
       font: {
         size: 16,
+        face: 'Helvetica',
+        color: '#ffffff'
+      }
+    },
+    sub: {
+      size: 16,  // Noch etwas kleinere Knoten
+      scaling: {
+        label: {
+          drawThreshold: 0,
+          min: 10,
+          max: 16,
+          maxVisible: 16
+        }
+      },
+      // Für die Sub-Knoten: Hintergrund den dritten Farbton und als Border den vierten Farbton verwenden
+      // Hintergrund: #0AA6A6, Border: #F2BC79
+      color: {
+        background: '#0AA6A6',
+        border: '#F2BC79'
+      },
+      font: {
+        size: 14,
         face: 'Verdana',
         color: '#ffffff'
       }
     },
     tools: {
-      size: 15, // Die kleinsten Nodes für Tools
+      size: 14,  // Die kleinsten Knoten für Tools
       scaling: {
         label: {
-          // Höhere drawThreshold, damit Labels nur bei näherem Zoom sichtbar werden
-          drawThreshold: 16,
-          min: 12,
-          max: 15,
-          maxVisible: 15
+          drawThreshold: 0,
+          min: 8,
+          max: 14,
+          maxVisible: 14
         }
       },
+      // Für Tools: Hintergrund den vierten Farbton und als Border erneut den fünften Farbton verwenden
+      // Hintergrund: #F2BC79, Border: #F2786D
       color: {
-        background: '#F27405',
-        border: '#731702'
+        background: '#F2BC79',
+        border: '#F2786D'
       },
       font: {
-        size: 14,
+        size: 12,
         face: 'Tahoma',
         color: '#ffffff'
       }
     }
   },
   edges: {
-    width: 2,
+    width: 1.5,
     smooth: {
       type: 'continuous'
     },
@@ -487,9 +493,9 @@ const options = {
   physics: {
     enabled: true,
     barnesHut: {
-      gravitationalConstant: -3000,
+      gravitationalConstant: -2000,
       centralGravity: 0.3,
-      springLength: 150,
+      springLength: 120,
       springConstant: 0.04,
       damping: 0.09,
       avoidOverlap: 0.5
@@ -502,9 +508,6 @@ const options = {
     multiselect: false
   }
 };
-
-
-
 
   const network = new vis.Network(container, data, options);
 
