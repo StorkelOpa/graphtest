@@ -363,51 +363,56 @@
 
   const container = document.getElementById('graph-container');
   const data = { nodes: nodes, edges: edges };
-  const options = {
+    
+const options = {
     nodes: {
-        shape: 'dot',      // Alternativ z.B. 'box' oder 'circularImage'
-        size: 20,
+        shape: 'dot',
+        size: 25, // Knotengröße bleibt unverändert
         scaling: {
-            min: 10,
-            max: 30,
+            min: 15,
+            max: 40,
             label: {
                 enabled: true,
-                min: 8,
-                max: 20,
-                maxVisible: 20,
-                drawThreshold: 12
+                min: 12,
+                max: 24,
+                maxVisible: 24,
+                drawThreshold: 14
             }
         },
         font: {
-            size: 16,
+            size: 18,
             face: 'Arial',
-            color: '#f8f8f2'
+            color: '#ffffff' // Helle Schriftfarbe für alle Nodes
         },
-        borderWidth: 2,
+        borderWidth: 3,
         shadow: true,
         color: {
             border: '#8BE9FD'
         },
         highlight: {
-            borderWidth: 4
+            borderWidth: 5
         }
     },
     groups: {
         center: {
-            color: { background: '#FF6B6B', border: '#E64A4A' },
-            font: { color: '#FFFFFF', size: 18, face: 'Arial' }
+            // Erste Farbe der Palette als Hintergrund und die zweite als Rand
+            color: { background: '#014040', border: '#02735E' },
+            font: { color: '#ffffff', size: 20, face: 'Arial' }
         },
         main: {
-            color: { background: '#4ECDC4', border: '#3CA39B' },
-            font: { color: '#000000', size: 16, face: 'Helvetica' }
+            // Zweite Farbe als Hintergrund, dritte als Rand
+            color: { background: '#02735E', border: '#03A678' },
+            font: { color: '#ffffff', size: 18, face: 'Helvetica' }
         },
         sub: {
-            color: { background: '#96CEB4', border: '#75A18D' },
-            font: { color: '#333333', size: 14, face: 'Verdana' }
+            // Dritte Farbe als Hintergrund, vierte als Rand
+            color: { background: '#03A678', border: '#F27405' },
+            font: { color: '#ffffff', size: 16, face: 'Verdana' }
         },
         tools: {
-            color: { background: '#FFEEAD', border: '#E6D785' },
-            font: { color: '#000000', size: 12, face: 'Tahoma' }
+            // Vierte Farbe als Hintergrund, fünfte als Rand
+            color: { background: '#F27405', border: '#731702' },
+            font: { color: '#ffffff', size: 14, face: 'Tahoma' }
         }
     },
     edges: {
@@ -439,9 +444,10 @@
         hover: true,
         zoomView: true,
         dragView: true,
-        multiselect: false,
+        multiselect: false
     }
 };
+
 
 
   const network = new vis.Network(container, data, options);
