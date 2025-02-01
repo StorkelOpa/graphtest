@@ -168,7 +168,7 @@ const nodesData = [
   // GIS mit QGIS
   { 
     id: 401, 
-    label: 'Geografische Daten in Bezug setzen & Netzwerke bilden', 
+    label: 'Geografische Daten visualisieren', 
     group: 'aspect', 
     description: 'Mit QGIS erforsche ich die komplexen Beziehungen zwischen geografischen Daten und visualisiere beeindruckende räumliche Zusammenhänge.' 
   },
