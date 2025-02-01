@@ -365,69 +365,85 @@
   const container = document.getElementById('graph-container');
   const data = { nodes: nodes, edges: edges };
   const options = {
-      nodes: {
-          shape: 'dot',
-          size: 20,
-          font: {
-              size: 16,
-              face: 'arial',
-              color: '#f8f8f2'
-          },
-          borderWidth: 2,
-          shadow: true,
-          color: {
-              border: '#8BE9FD'
-          },
-          highlight: {
-              borderWidth: 4
-          }
-      },
-      edges: {
-          width: 2,
-          smooth: {
-              type: 'continuous'
-          },
-          arrows: {
-              to: { enabled: true, scaleFactor: 0.5 }
-          },
-          color: {
-              color: '#6272a4',
-              highlight: '#f8f8f2',
-              hover: '#f8f8f2'
-          }
-      },
-      groups: {
-          center: {
-              color: { background: '#FF6B6B', border: '#E64A4A' }
-          },
-          main: {
-              color: { background: '#4ECDC4', border: '#3CA39B' }
-          },
-          sub: {
-              color: { background: '#96CEB4', border: '#75A18D' }
-          },
-          tools: {
-              color: { background: '#FFEEAD', border: '#E6D785' }
-          },
-      },
-      physics: {
-          enabled: true,
-          barnesHut: {
-              gravitationalConstant: -3000,
-              centralGravity: 0.3,
-              springLength: 150,
-              springConstant: 0.04,
-              damping: 0.09,
-              avoidOverlap: 0.5
-          }
-      },
-      interaction: {
-          hover: true,
-          zoomView: true,
-          dragView: true,
-          multiselect: false,
-      }
-  };
+    nodes: {
+        shape: 'dot',      // Alternativ z.B. 'box' oder 'circularImage'
+        size: 20,
+        scaling: {
+            min: 10,
+            max: 30,
+            label: {
+                enabled: true,
+                min: 8,
+                max: 20,
+                maxVisible: 20,
+                drawThreshold: 12
+            }
+        },
+        font: {
+            size: 16,
+            face: 'Arial',
+            color: '#f8f8f2'
+        },
+        borderWidth: 2,
+        shadow: true,
+        color: {
+            border: '#8BE9FD'
+        },
+        highlight: {
+            borderWidth: 4
+        }
+    },
+    groups: {
+        center: {
+            color: { background: '#FF6B6B', border: '#E64A4A' },
+            font: { color: '#FFFFFF', size: 18, face: 'Arial' }
+        },
+        main: {
+            color: { background: '#4ECDC4', border: '#3CA39B' },
+            font: { color: '#000000', size: 16, face: 'Helvetica' }
+        },
+        sub: {
+            color: { background: '#96CEB4', border: '#75A18D' },
+            font: { color: '#333333', size: 14, face: 'Verdana' }
+        },
+        tools: {
+            color: { background: '#FFEEAD', border: '#E6D785' },
+            font: { color: '#000000', size: 12, face: 'Tahoma' }
+        }
+    },
+    edges: {
+        width: 2,
+        smooth: {
+            type: 'continuous'
+        },
+        arrows: {
+            to: { enabled: true, scaleFactor: 0.5 }
+        },
+        color: {
+            color: '#6272a4',
+            highlight: '#f8f8f2',
+            hover: '#f8f8f2'
+        }
+    },
+    physics: {
+        enabled: true,
+        barnesHut: {
+            gravitationalConstant: -3000,
+            centralGravity: 0.3,
+            springLength: 150,
+            springConstant: 0.04,
+            damping: 0.09,
+            avoidOverlap: 0.5
+        }
+    },
+    interaction: {
+        hover: true,
+        zoomView: true,
+        dragView: true,
+        multiselect: false,
+    }
+};
+
 
   const network = new vis.Network(container, data, options);
 
